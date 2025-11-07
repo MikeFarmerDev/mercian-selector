@@ -1,0 +1,69 @@
+{
+  "phase": "Shopify → Excel Sync",
+  "excel": {
+    "path": "data/StickSelection.xlsx",
+    "sheet": "Sheet1",
+    "primary_key": "Product Code"
+  },
+  "shopify": {
+    "source_json": "products_full.json",
+    "flattened_csv": "outputs/shopify_update.csv"
+  },
+    "inventory": {
+    "flat_csv": "outputs/inventory_flat.csv"
+  },
+  "columns": {
+    "allowed_updates": {
+      "Price (excluding VAT)": "shopify.price_ex_vat",
+      "Full Price": "calc:price_ex_vat*(1+vat_rate)",
+      "Image URL": "shopify.image_url",
+      "Product URL": "shopify.product_url",
+      "Active": "shopify.active",
+      "Colour": "shopify.colour",
+      "Description": "shopify.short_description",
+      "Description Narrative": "shopify.short_description"
+    },
+    "never_overwrite": [
+      "Drag Flicking",
+      "Aerial",
+      "Reverse Stick Hitting",
+      "Power",
+      "Touch and Control",
+      "3D",
+      "Playing Level",
+      "Bow",
+      "Carbon",
+      "Length",
+      "Player Type"
+    ],
+    "guarded": [
+      "Bow",
+      "Carbon",
+      "Length"
+        ],
+    "create_if_missing": [
+      "Image URL",
+      "Product URL",
+      "Active",
+      "Shopify Status",
+      "Shopify Active",
+      "VAT Rate",
+      "Colour",
+      "Description",
+      "Description Narrative"
+    ],
+    "vat_column": "VAT Rate",
+    "default_vat_rate": 0.2
+  },
+  "reporting": {
+    "sync_report_csv": "outputs/sync_report.csv",
+    "coaching_exceptions_csv": "outputs/sync_exceptions_coaching.csv",
+    "backup_dir": "backups"
+  },
+  "behaviour": {
+    "allow_new_products": true,
+    "list_new_in_report": true,
+    "list_missing_in_report": true,
+    "never_delete_excel_rows": true
+  }
+}

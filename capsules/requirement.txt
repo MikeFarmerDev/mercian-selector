@@ -1,0 +1,19 @@
+Selector AI Core — requirement.txt (v1.0 baseline template)
+Source: AIv1.0 handover — Requirement Capsule (Verified example included)
+
+# Fill these from the front-end form for each request
+Journey: {{journey}}              # integer 1–10
+Type: {{player_type}}             # "Outdoor" | "Indoor"
+Attacking: {{attacking}}/10
+All-round: {{all_round}}/10
+Defending: {{defending}}/10
+Drag Flick: {{drag_flick}}/10
+Aerials: {{aerials}}/10
+Budget: £{{budget_gbp}}
+What Matters: {{focus}}           # "Power" | "Control" | "Both"
+Preferred Bow: {{preferred_bow}}  # e.g., "Pro" | "Ultimate V2" | "Don't Know"
+Stick Length: {{length_in}}       # e.g., 36.5″
+
+# Reference example (from validated simulation)
+# Journey = 9; Type = Outdoor; Attacking 9/10; Defending 2/10; Drag Flick 4/10; Aerials 10/10;
+# Budget = £190; What Matters = Both; Preferred Bow = Don’t Know; Length = 36.5″

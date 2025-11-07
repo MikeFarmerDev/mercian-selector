@@ -1,0 +1,352 @@
+
+<style>
+.selector-background {<br />
+  background-image: url('http://aissess-test.local/wp-content/uploads/2025/08/Instagram_01_2048h_q85.jpg');<br />
+  background-size: 110%; /* slightly zoomed for motion */<br />
+  background-color: #e5e5e5; /* Mercian grey safety net */<br />
+  background-position: center;<br />
+  background-repeat: no-repeat;<br />
+  position: relative;<br />
+  min-height: 100vh;<br />
+  animation: slow-diagonal 40s ease-in-out infinite alternate;<br />
+}</p>
+<p>.selector-background::before {<br />
+  content: "";<br />
+  position: absolute;<br />
+  inset: 0;<br />
+  background-color: rgba(255,255,255,0.2); /* white at 70% opacity */<br />
+  z-index: 1;<br />
+}</p>
+<p>.selector-background > * {<br />
+  position: relative;<br />
+  z-index: 2;<br />
+}</p>
+<p>@keyframes slow-diagonal {<br />
+  0% { background-position: center; }<br />
+  100% { background-position: top right; }<br />
+}<br />
+</style>
+
+<!-- wp:paragraph {"className":"is-style-default"} -->
+<p class="is-style-default"></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:group {"className":"selector-background","layout":{"type":"constrained"}} -->
+<div class="wp-block-group selector-background"><!-- wp:html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Find Your Perfect Stick | Mercian</title>
+  <meta name="version" content="v0.5 – cleaned & functional">
+  <style>
+    body { font-family: Avenir, Arial, sans-serif; margin: 40px auto; max-width: 800px; padding: 0 20px; }
+    .page-title { text-align: center; font-size: 40px; margin-bottom: 30px; color: #ED1C24; }
+    label { font-weight: bold; display: block; margin-top: 20px; }
+    input[type=range], select { width: 100%; height: 35px; margin-top: 5px; font-size: 16px; }
+    input[type=range] { height: 8px; -webkit-appearance: none; appearance: none; background: #ccc; border-radius: 5px; outline: none; transition: background .3s; }
+    input[type=range]::-webkit-slider-thumb, input[type=range]::-moz-range-thumb {
+      height: 20px; width: 20px; background: #ED1C24; border-radius: 50%; cursor: pointer; border: none;
+    }
+    .result { margin-top: 30px; padding: 20px; border: 1px solid #ccc; background-color: #f9f9f9; }
+    .result img { border: 1px solid #ddd; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+    /* Stick card layout: grey narrative on top, image + button below */
+    .stick-card {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      margin-bottom: 18px;
+      overflow: hidden;
+    }
+    .stick-card__text {
+      background: #ddd;          /* your grey bar */
+      padding: 12px 14px;
+      font-size: 14px;
+      line-height: 1.35;
+      text-align: center;
+    }
+    .stick-card__bottom {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 12px;
+      padding: 12px 14px 14px 14px;
+      align-items: center;
+    }
+    .stick-card__image img {
+      width: 120px;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid #eee;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+    .stick-card__action a {
+      display: inline-block;
+      background: #5cb3da;       /* Mercian secondary blue (example) */
+      color: #fff;
+      padding: 10px 16px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 600;
+      text-align: center;
+    }
+    .stick-card__action a:hover {
+      background: #3e9bc5;       /* slightly darker blue for hover */
+      transform: translateY(-1px);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      transition: all 0.2s ease;
+    }
+    /* Align View Product button to right on desktop, center on mobile */
+    .stick-card__action {
+      text-align: right;
+      margin-top: 6px;   /* adds subtle spacing below image */
+    }
+
+    @media (max-width: 600px) {
+      .stick-card__action {
+        text-align: center;
+        margin-top: 8px;  /* slightly more room on mobile */
+      }
+    }
+
+
+    .result ul li img { float: none !important; margin: 0 12px 0 0 !important; }
+    button { margin-top: 30px; padding: 12px 20px; font-size: 16px; width: 100%; background-color: #ED1C24; color: #fff; border: none; cursor: pointer; }
+
+    button:hover { background-color: #c60f18; }
+    button[disabled] { opacity: .7; cursor: not-allowed; }
+    .info-icon { text-decoration: none; float: right; font-size: 1.1em; margin-top: -28px; }
+    .popup-box { font-size: 15px; background-color: #fff; border: 1px solid #ED1C24; padding: 15px; margin-top: 10px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); color: #333; line-height: 1.5; }
+    @media (max-width: 600px) {
+      body { margin: 20px auto; padding: 0 10px; font-size: 16px; }
+      label { font-size: 16px; }
+      button { font-size: 18px; padding: 14px; }
+      .info-icon { font-size: 1.4em; margin-top: -24px; }
+      input[type=range], select { font-size: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <h1 class="page-title">Find Your Perfect Stick</h1>
+
+  <!-- Sliders + Select Inputs -->
+  <label for="skill">Where are you on your hockey journey?</label>
+  <input type="range" id="skill" name="skill" min="0" max="10" value="0">
+  <span id="skillValue">0</span>
+
+  <label for="attack">How important is attacking play to you?</label>
+  <input type="range" id="attack" name="attack" min="0" max="10" value="0">
+  <span id="attackValue">0</span>
+
+  <label for="midfield">How important is all-round play to you?</label>
+  <input type="range" id="midfield" name="midfield" min="0" max="10" value="0">
+  <span id="midfieldValue">0</span>
+
+  <label for="defence">How important is defensive play to you?</label>
+  <input type="range" id="defence" name="defence" min="0" max="10" value="0">
+  <span id="defenceValue">0</span>
+
+  <label for="budget">What’s your budget?</label>
+  <input type="range" id="budget" name="budget" min="10" max="400" step="5" value="0">
+  <span id="budgetValue">£0</span>
+
+  <label for="dragflick">How important is drag flicking to you?</label>
+  <input type="range" id="dragflick" name="dragflick" min="0" max="10" value="0">
+  <span id="dragflickValue">0</span>
+
+  <label for="aerials">How important are aerials to you?</label>
+  <input type="range" id="aerials" name="aerials" min="0" max="10" value="0">
+  <span id="aerialsValue">0</span>
+
+  <label for="category">What type of player are you?</label>
+  <select id="category" name="category">
+    <option value="outdoor player">Outdoor Player</option>
+    <option value="outdoor goalkeeper">Outdoor Goalkeeper</option>
+    <option value="indoor player">Indoor Player</option>
+    <option value="indoor goalkeeper">Indoor Goalkeeper</option>
+  </select>
+
+  <label for="priority">What matters more to you in a stick?</label>
+  <select id="priority" name="priority">
+    <option value="touch">Touch and Control</option>
+    <option value="power">Power / hitting and passing strength</option>
+    <option value="both">I want both</option>
+    <option value="unknown">Not sure</option>
+  </select>
+
+  <label for="bow">Preferred Bow Type</label>
+  <a href="/bow-guide.pdf" target="_blank" class="info-icon">ⓘ</a>
+  <select id="bow" name="bow">
+    <option value="unknown">Don’t Know</option>
+    <option value="standard">Standard Bend</option>
+    <option value="dsh">DSH (Dragflick Specialist Head)</option>
+    <option value="pro">Pro Bend</option>
+    <option value="ultimate">Ultimate Bend</option>
+    <option value="xtreme">Xtreme Bend</option>
+    <option value="znake">Znake Bend</option>
+  </select>
+
+  <div class="label-with-icon">
+    <label for="length">What stick length do you want?</label>
+    <a href="#" onclick="toggleStickInfo(); return false;" class="info-icon">ⓘ</a>
+  </div>
+  <div id="stick-info" class="popup-box" style="display:none;">
+    <strong>Need help choosing a length?</strong>
+    <a href="#" onclick="toggleStickInfo(); return false;" style="float:right; font-size:14px; color:#ED1C24;">[close]</a>
+    <br><br>
+    <u>Guidance by height:</u><br>
+    • &lt; 122 cm: 24–28"<br>
+    • 122–137 cm: 28–32"<br>
+    • 137–152 cm: 33–34"<br>
+    • 152–165 cm: 35"<br>
+    • 165–183 cm: 36.5"<br>
+    • &gt; 183 cm: 37.5"<br><br>
+    <em>This is a guide only — personal preference may affect optimal length.</em>
+  </div>
+
+  <select id="length" name="length">
+    <option value="16">16"</option>
+    <option value="22">22"</option>
+    <option value="24">24"</option>
+    <option value="26">26"</option>
+    <option value="28">28"</option>
+    <option value="30">30"</option>
+    <option value="32">32"</option>
+    <option value="34">34"</option>
+    <option value="35">35"</option>
+    <option value="36.5" selected>36.5"</option>
+    <option value="37.5">37.5"</option>
+  </select>
+
+  <button id="get-recommendation" onclick="getStickRecommendation()">Get My Recommendation</button>
+
+  <div class="result" id="result"></div>
+
+  <script>
+    // --- live slider styling ---
+    const sliders = ['attack', 'midfield', 'defence', 'skill', 'budget', 'dragflick', 'aerials'];
+    sliders.forEach(id => {
+      const slider = document.getElementById(id);
+      const display = document.getElementById(id + 'Value');
+      const updateValue = () => {
+        display.textContent = id === 'budget' ? '£' + slider.value : slider.value;
+        const percentage = ((slider.value - slider.min) / (slider.max - slider.min)) * 100;
+        slider.style.background = `linear-gradient(to right, #ED1C24 0%, #ED1C24 ${percentage}%, #ccc ${percentage}%, #ccc 100%)`;
+      };
+      updateValue();
+      slider.addEventListener('input', updateValue);
+    });
+
+    const API_URL = "http://aissess-test.local:5000";
+    const fmt = v => Number.isFinite(+v) ? (+v).toFixed(2) : "";
+
+    // --- main function (fixed, single version) ---
+    async function getStickRecommendation() {
+      const sticklength = document.getElementById("length");
+      const payload = {
+        skill: skill.value, attack: attack.value, midfield: midfield.value, defence: defence.value,
+        budget: budget.value, dragflick: dragflick.value, aerials: aerials.value,
+        category: category.value, priority: priority.value, bow: bow.value, length: sticklength.value
+      };
+      console.log("DEBUG length field:", length, length?.value); // NEW
+      const resultBox = document.getElementById('result');
+      const btn = document.getElementById('get-recommendation');
+      resultBox.innerHTML = "Finding your sticks…";
+      btn.disabled = true; btn.textContent = "Finding your sticks…";
+
+      try {
+          const res = await fetch('/api/recommend', {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+
+        if (!res.ok || !data.ok) {
+          resultBox.innerHTML = `<strong>Error:</strong> ${data.error || 'Request failed'}`;
+          return;
+        }
+
+        let html = "<h3>Your Stick Recommendations</h3>";
+
+        if (data.primaries?.length) {
+          html += "<h4>Primaries</h4>";
+          data.primaries.forEach(stick => {
+            html += `
+              <div class="stick-card">
+                <div class="stick-card__text">
+                  <strong>${stick["Title"] || stick["Description"]}</strong><br>
+                  (Code: ${stick["Product Code"]}, Bow: ${stick["Bow"]}, Carbon: ${stick["Carbon"]}%, Price: £${fmt(stick["Full Price"])})
+                </div>
+                <div class="stick-card__bottom">
+                  <div class="stick-card__image">
+                    ${stick.image_url ? `<img src="${stick.image_url}" alt="${stick["Description"]}">` : ""}
+                  </div>
+                  <div class="stick-card__action">
+                    ${stick.product_url ? `<a href="${stick.product_url}" target="_blank">View product →</a>` : `<span style="font-size:13px;color:#777;">No product link</span>`}
+                  </div>
+                </div>
+              </div>
+            `;
+          });
+        }
+
+
+if (data.wildcard) {
+  const wcImg  = data.wildcard.image_url;  // ← use wildcard only
+  const wcLink = data.wildcard.product_url || (data.primaries?.[0]?.product_url ?? "");
+  html += "<h4>Wildcard Option</h4>";
+          html += `
+            <div class="stick-card">
+              <div class="stick-card__text">
+                <strong>${data.wildcard["Title"] || data.wildcard["Description"]}</strong><br>
+                (Code: ${data.wildcard["Product Code"]}, Bow: ${data.wildcard["Bow"]}, Carbon: ${data.wildcard["Carbon"]}%, Price: £${fmt(data.wildcard["Full Price"])})
+              </div>
+              <div class="stick-card__bottom">
+                <div class="stick-card__image">
+                  ${wcImg ? `<img src="${wcImg}" alt="${data.wildcard["Description"]}">` : ""}
+                </div>
+                <div class="stick-card__action">
+                  ${wcLink ? `<a href="${wcLink}" target="_blank">View product →</a>` : `<span style="font-size:13px;color:#777;">No product link</span>`}
+                </div>
+              </div>
+            </div>
+          `;
+        }
+
+
+// --- rationale display (preserve paragraphs if available) ---
+if (data.rationale) {
+  const r = data.rationale;
+  const text = r.summary_html || r.summary || "";
+  html += `<div class="popup-box"><strong>Why these?</strong> ${text}</div>`;
+}
+
+        resultBox.innerHTML = html;
+      } catch (err) {
+  console.error("Fetch failed:", err);
+  resultBox.innerHTML = `<strong>Network error:</strong> ${err.message || JSON.stringify(err)}`;
+}
+ finally {
+        btn.disabled = false;
+        btn.textContent = "Get My Recommendation";
+      }
+    }
+
+    function toggleStickInfo() {
+      const box = document.getElementById('stick-info');
+      box.style.display = box.style.display === 'none' ? 'block' : 'none';
+    }
+  </script>
+
+</body>
+</html>
+
+<!-- /wp:html --></div>
+<!-- /wp:group -->
+
+<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->

@@ -1,0 +1,5 @@
+Flattened rows: 1921
+Updated_at range: 2021-06-08T16:44:32+01:00 → 2025-11-02T17:15:32+00:00
+Rows by location_id (name):
+  - 48176791707 (Manor Way): 1911
+  - 66818769051 (POS Pop Up): 10

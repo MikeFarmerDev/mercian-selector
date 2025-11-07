@@ -1,0 +1,24 @@
+Selector AI Core — business_logic.txt (v1.0)
+Source: AIv1.0 handover — Business Logic Capsule (filters.py + scoring.py)
+
+Principle — Select sticks that best satisfy journey, priorities, and budget.
+Filtering removes out-of-tier and price-exceeding options; scoring ranks the rest.
+
+Hard Filters
+- Journey tier map (Genesis → Elite).
+- Price ≤ budget + 5%.
+- Length ± 0.5″, but only if the right size sticks aren't available.
+- Player type match.
+
+Scoring Weights
+- Affordability: 0.35  (near-budget u¹·⁵ curve)
+- Min Spec Penalty: -0.6 / -0.3 (below carbon thresholds)
+- Preferred Bow match: 0.15
+- Aerial Bias (triggered ≥ 8): 0.24
+- Drag Flick Bias (triggered ≥ 8): 0.24
+- Power Priority: 0.08 (if focus=Power)
+- Touch Priority: 0.08 (if focus=Control)
+- Both: 0.08 (split bias)
+Tie-breaks → Score > Price > Weight > Random (for variety).
+
+Template — “These three sticks align with your priorities for {dominant skill} while staying within budget and preferred feel.”

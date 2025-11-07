@@ -1,0 +1,183 @@
+{
+  "product": {
+    "data": {
+      "metafieldDefinitions": {
+        "edges": [
+          {
+            "node": {
+              "namespace": "mm-google-shopping",
+              "key": "custom_product",
+              "name": "Google: Custom Product",
+              "type": {
+                "name": "boolean"
+              },
+              "description": "Use to indicate whether or not the unique product identifiers (UPIs) GTIN, MPN, and brand are available for your product."
+            }
+          },
+          {
+            "node": {
+              "namespace": "shopify",
+              "key": "color-pattern",
+              "name": "Color",
+              "type": {
+                "name": "list.metaobject_reference"
+              },
+              "description": "Defines the primary color or pattern, such as blue or striped"
+            }
+          }
+        ]
+      }
+    },
+    "extensions": {
+      "cost": {
+        "requestedQueryCost": 22,
+        "actualQueryCost": 2,
+        "throttleStatus": {
+          "maximumAvailable": 2000.0,
+          "currentlyAvailable": 1998,
+          "restoreRate": 100.0
+        }
+      }
+    }
+  },
+  "variant": {
+    "data": {
+      "metafieldDefinitions": {
+        "edges": [
+          {
+            "node": {
+              "namespace": "mm-google-shopping",
+              "key": "custom_label_4",
+              "name": "Google: Custom Label 4",
+              "type": {
+                "name": "single_line_text_field"
+              },
+              "description": "Label that you assign to a product to help organize bidding and reporting in Shopping campaigns"
+            }
+          },
+          {
+            "node": {
+              "namespace": "mm-google-shopping",
+              "key": "custom_label_3",
+              "name": "Google: Custom Label 3",
+              "type": {
+                "name": "single_line_text_field"
+              },
+              "description": "Label that you assign to a product to help organize bidding and reporting in Shopping campaigns"
+            }
+          },
+          {
+            "node": {
+              "namespace": "mm-google-shopping",
+              "key": "custom_label_2",
+              "name": "Google: Custom Label 2",
+              "type": {
+                "name": "single_line_text_field"
+              },
+              "description": "Label that you assign to a product to help organize bidding and reporting in Shopping campaigns"
+            }
+          },
+          {
+            "node": {
+              "namespace": "mm-google-shopping",
+              "key": "custom_label_1",
+              "name": "Google: Custom Label 1",
+              "type": {
+                "name": "single_line_text_field"
+              },
+              "description": "Label that you assign to a product to help organize bidding and reporting in Shopping campaigns"
+            }
+          },
+          {
+            "node": {
+              "namespace": "mm-google-shopping",
+              "key": "custom_label_0",
+              "name": "Google: Custom Label 0",
+              "type": {
+                "name": "single_line_text_field"
+              },
+              "description": "Label that you assign to a product to help organize bidding and reporting in Shopping campaigns"
+            }
+          },
+          {
+            "node": {
+              "namespace": "mm-google-shopping",
+              "key": "size_system",
+              "name": "Google: Size System",
+              "type": {
+                "name": "single_line_text_field"
+              },
+              "description": "The country of the size system used by your product."
+            }
+          },
+          {
+            "node": {
+              "namespace": "mm-google-shopping",
+              "key": "size_type",
+              "name": "Google: Size Type",
+              "type": {
+                "name": "single_line_text_field"
+              },
+              "description": "Your apparel product’s cut."
+            }
+          },
+          {
+            "node": {
+              "namespace": "mm-google-shopping",
+              "key": "mpn",
+              "name": "Google: MPN",
+              "type": {
+                "name": "single_line_text_field"
+              },
+              "description": "Your product’s Manufacturer Part Number (MPN)."
+            }
+          },
+          {
+            "node": {
+              "namespace": "mm-google-shopping",
+              "key": "gender",
+              "name": "Google: Gender",
+              "type": {
+                "name": "single_line_text_field"
+              },
+              "description": "The gender for which your product is intended."
+            }
+          },
+          {
+            "node": {
+              "namespace": "mm-google-shopping",
+              "key": "condition",
+              "name": "Google: Condition",
+              "type": {
+                "name": "single_line_text_field"
+              },
+              "description": "The condition of your product at time of sale."
+            }
+          },
+          {
+            "node": {
+              "namespace": "mm-google-shopping",
+              "key": "age_group",
+              "name": "Google: Age Group",
+              "type": {
+                "name": "single_line_text_field"
+              },
+              "description": "The demographic for which your product is intended."
+            }
+          }
+        ]
+      }
+    },
+    "extensions": {
+      "cost": {
+        "requestedQueryCost": 22,
+        "actualQueryCost": 3,
+        "throttleStatus": {
+          "maximumAvailable": 2000.0,
+          "currentlyAvailable": 1997,
+          "restoreRate": 100.0
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,14 @@
+=== Flatten Summary ===
+Products: 106
+Variants (rows): 444
+
+Product status counts:
+  - ACTIVE: 78
+  - ARCHIVED: 17
+  - DRAFT: 11
+
+Variants available_for_sale: true=247, false=197, unknown=0
+Price stats: min=6.67, median=46.67, max=312.50
+Total inventory qty (sum of known): n/a
+Missing price rows: 0
+Missing variant_id rows: 0
