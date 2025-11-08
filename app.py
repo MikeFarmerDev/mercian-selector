@@ -43,12 +43,6 @@ CORS(app, resources={
     }
 })
 
-
-# --- Load dataset once at startup ---
-from data_loader import load_excel_config
-
-df = load_excel_config()
-
 print(">>> Dataset Loaded:", df.shape)
 
 PLAYER_TYPE_MAP = {
