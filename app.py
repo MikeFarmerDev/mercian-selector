@@ -415,6 +415,9 @@ def recommend():
       "wildcard_out_type=", type(wildcard_out),
       "sample_primary=", primaries_out[0].get("Description") if primaries_out else "NONE")
 
+        app.logger.error(f"DBG_COUNTS primaries={len(primaries_out)} wildcard={len(wildcard_out)} sample_primary={(primaries_out[0].get('Product Code') if isinstance(primaries_out, list) and primaries_out else 'NONE')}")
+
+
         raw_rationale = generate_rationale(profile, primaries_out, wildcard_out)
 
         app.logger.error(f"DBG_COUNTS primaries={len(primaries_out)} wildcard={len(wildcard_out)} sample_primary={(primaries_out[0].get('Product Code') if isinstance(primaries_out, list) and primaries_out else 'NONE')}")
