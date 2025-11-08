@@ -138,11 +138,8 @@ def generate_rationale(profile, primaries, wildcard, allowed_bows=None):
             })
 
         any_sc = any(x["solid_core"] for x in items)
-        highest_carbon = max(
-            (int(x["carbon"]) or 0)
-            for x in items
-            if str(x["carbon"]).isdigit()
-        ) if items else 0
+        highest_carbon = max((int(float(x.get("carbon") or 0)) for x in items if str(x.get("carbon") or "").strip() not in ("", "nan")), default=0)
+
 
         lead = (
             f"Because you prioritise attacking play and aerial skills, we've selected three sticks that match your style "
