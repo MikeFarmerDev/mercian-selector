@@ -104,6 +104,9 @@ def recommend():
 
     payload = request.get_json(silent=True) or {}
 
+    app.logger.error(f"DBG_PAYLOAD {payload}")
+
+
     required = ["skill", "attack", "midfield", "defence", "budget",
                 "dragflick", "aerials", "category", "priority", "bow", "length"]
 
