@@ -206,6 +206,10 @@ def recommend():
     # always reload latest dataset so new Image URL / Product URL are used
     df = load_dataset()
 
+    app.logger.error("DBG_DF_DTYPES %s", {c: str(t) for c, t in df.dtypes.items()})
+    app.logger.error("DBG_DF_SAMPLE %s", df.head(2).to_dict(orient='records'))
+
+
     # [MOD] tier gating via domain
     allowed_tiers = allowed_tiers_for(profile["journey"])
 
