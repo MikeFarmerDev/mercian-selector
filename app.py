@@ -126,6 +126,15 @@ def recommend():
     req_id = hashlib.sha1((_payload_str + "|" + str(time.time())).encode("utf-8")).hexdigest()[:12]
     app.logger.error(f"L2_DIAG_REQ id={req_id}")
 
+        # L2_DIAG: stable fingerprint of payload ONLY (detect duplicate handling)
+    try:
+        _payload_canon = _json.dumps(payload, sort_keys=True, ensure_ascii=False)
+    except Exception:
+        _payload_canon = str(payload)
+    fp = hashlib.sha1(_payload_canon.encode("utf-8")).hexdigest()[:12]
+    app.logger.error(f"L2_FP fp={fp}")
+
+
     required = ["skill", "attack", "midfield", "defence", "budget",
                 "dragflick", "aerials", "category", "priority", "bow", "length"]
 
