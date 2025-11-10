@@ -470,16 +470,32 @@ def recommend():
 
         # --- preserve punctuation and paragraph breaks for frontend display ---
         full_text = re.sub(r"[ \t]+", " ", full_text)  # tidy spaces, keep \n
+        # ensure terminal punctuation BEFORE building HTML so both variants match
+        if full_text and not full_text.endswith((".", "!", "?")):
+            full_text += "."
 
         # build HTML paragraphs from \n
         paras = [p.strip() for p in full_text.split("\n") if p.strip()]
         full_text_html = "".join(f"<p>{p}</p>" for p in paras)
 
-        # make sure it ends properly
-        if full_text and not full_text.endswith((".", "!", "?")):
-            full_text += "."
-
         rationale = {"summary": full_text, "summary_html": full_text_html}
+
+        # L2_DIAG: ensure source/meta exist even if adapter supplied the rationale
+        if isinstance(rationale, dict) and "source" not in rationale:
+            _raw = (
+                rationale.get("summary")
+                or rationale.get("summary_html")
+                or rationale.get("text")
+                or ""
+            )
+            # crude text-length for meta; strip tags if html-ish
+            try:
+                import re as _re
+                _chars = len(_re.sub(r"<[^>]+>", "", str(_raw)))
+            except Exception:
+                _chars = len(str(_raw))
+            rationale["source"] = "deterministic"
+            rationale.setdefault("meta", {})["chars"] = _chars
 
     # L2_SANITIZE: ensure UI renders the rationale once only
     # If HTML is present, blank the plain summary so front-end can't double-render.
