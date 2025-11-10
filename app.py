@@ -392,7 +392,7 @@ def recommend():
         adapter_text = rationale.get("summary") or rationale.get("text") or ""
         adapter_had_bullets = "bullets" in rationale
 
-    needs_openai = (word_count(adapter_text) < 120) or adapter_had_bullets
+    needs_openai = (word_count(adapter_text) < 1200) or adapter_had_bullets
 
     app.logger.error(f"L2_DIAG needs_openai={needs_openai} adapter_wc={word_count(adapter_text)} had_bullets={adapter_had_bullets}")
 
