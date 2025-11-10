@@ -103,7 +103,7 @@ def generate_rationale(profile, primaries, wildcard, allowed_bows=None):
                 timeout=s.request_timeout,
             )
             content = resp.choices[0].message.content.strip() if resp.choices else ""
-             _diag_log("post_ai", content[:4000])  # L2_DIAG: capture raw AI text (truncated)
+            _diag_log("post_ai", content[:4000])  # L2_DIAG: capture raw AI text (truncated)
             return {"summary": content, "bullets": []}
         except Exception as e:
             print("RATIONALE ERROR (custom prompt):", repr(e))
