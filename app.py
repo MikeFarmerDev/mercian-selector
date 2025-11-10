@@ -43,6 +43,17 @@ CORS(app, resources={
     }
 })
 
+# --- L2 diagnostics: print full traceback for any unhandled error ---
+import traceback
+
+@app.errorhandler(Exception)
+def _diag_handle_exception(e):
+    # Print full stack to console for this run
+    traceback.print_exc()
+    # Return a JSON error body so the client sees something useful
+    return jsonify({"ok": False, "error": str(e)}), 500
+
+
 print(">>> Dataset Loaded:", df.shape)
 
 PLAYER_TYPE_MAP = {
@@ -106,6 +117,14 @@ def recommend():
 
     app.logger.error(f"DBG_PAYLOAD {payload}")
 
+    # L2_DIAG: per-request id to detect duplicate handling in prod
+    import hashlib, time, json as _json
+    try:
+        _payload_str = _json.dumps(payload, sort_keys=True, ensure_ascii=False)
+    except Exception:
+        _payload_str = str(payload)
+    req_id = hashlib.sha1((_payload_str + "|" + str(time.time())).encode("utf-8")).hexdigest()[:12]
+    app.logger.error(f"L2_DIAG_REQ id={req_id}")
 
     required = ["skill", "attack", "midfield", "defence", "budget",
                 "dragflick", "aerials", "category", "priority", "bow", "length"]
@@ -365,6 +384,8 @@ def recommend():
         adapter_had_bullets = "bullets" in rationale
 
     needs_openai = (word_count(adapter_text) < 120) or adapter_had_bullets
+
+    app.logger.error(f"L2_DIAG needs_openai={needs_openai} adapter_wc={word_count(adapter_text)} had_bullets={adapter_had_bullets}")
 
     if needs_openai:
         # 1) Build rich context
