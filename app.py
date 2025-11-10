@@ -481,6 +481,12 @@ def recommend():
 
         rationale = {"summary": full_text, "summary_html": full_text_html}
 
+    # L2_SANITIZE: ensure UI renders the rationale once only
+    # If HTML is present, blank the plain summary so front-end can't double-render.
+    if isinstance(rationale, dict) and rationale.get("summary_html"):
+        rationale["summary"] = ""
+        app.logger.error("L2_SANITIZE rationale: using summary_html only")
+
 
     payload = {
         "ok": True,
