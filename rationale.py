@@ -107,7 +107,12 @@ def generate_rationale(profile, primaries, wildcard, allowed_bows=None):
                 content = resp.choices[0].message.content.strip() if resp.choices else ""
                 _diag_log("post_ai", f"ms={dt_ms} chars={len(content)} :: {content[:4000]}")
                 _diag_log("rationale_source", "openai")
-                return {"summary": content, "bullets": [], "source": "openai"}
+                return {
+                    "summary": content,
+                    "bullets": [],
+                    "source": "openai",
+                    "meta": {"ms": dt_ms, "chars": len(content)}
+                }
             except Exception as e:
                 _diag_log("post_ai_retry", f"try={_try} error={repr(e)}")
                 time.sleep(0.8 * _try)
@@ -195,7 +200,12 @@ def generate_rationale(profile, primaries, wildcard, allowed_bows=None):
         summary_text = f"Why these?\n{lead}{family_line} {power_touch}{sc_line}{close}"
         _diag_log("deterministic_out", summary_text[:4000])  # L2_DIAG: capture deterministic text
         _diag_log("rationale_source", "deterministic")
-        return {"summary": summary_text.strip(), "bullets": [], "source": "deterministic"}
+        return {
+            "summary": summary_text.strip(),
+            "bullets": [],
+            "source": "deterministic",
+            "meta": {"chars": len(summary_text)}
+        }
 
     prompt = f"""
 CONSTRAINTS:
@@ -244,6 +254,10 @@ Return a JSON object ONLY:
     _diag_log("pre_ai", prompt)
 
 
+# change (new or modified lines)
+    t0 = time.time()
+
+# line after (unchanged)
     try:
         resp = client.chat.completions.create(
             model=s.model,
@@ -256,6 +270,9 @@ Return a JSON object ONLY:
             timeout=s.request_timeout,
             response_format={"type": "json_object"},
         )
+
+# change (new or modified lines)
+        dt_ms = int((time.time() - t0) * 1000)
 
         raw = resp.choices[0].message.content.strip()
 
@@ -275,6 +292,8 @@ Return a JSON object ONLY:
                 b for b in parsed.get("bullets", [])
                 if isinstance(b, str) and b.strip()
             ][:4],
+            "source": "openai",
+            "meta": {"ms": dt_ms, "chars": len(parsed.get("summary", ""))}
         }
 
     except Exception as e:

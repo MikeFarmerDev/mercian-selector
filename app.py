@@ -487,7 +487,10 @@ def recommend():
         rationale["summary"] = ""
         app.logger.error("L2_SANITIZE rationale: using summary_html only")
 
+    r_src  = (rationale or {}).get("source", "unknown") if isinstance(rationale, dict) else "unknown"
+    r_meta = (rationale or {}).get("meta", {})           if isinstance(rationale, dict) else {}
 
+    # line after (unchanged)
     payload = {
         "ok": True,
         "profile": profile,
@@ -495,6 +498,10 @@ def recommend():
         "wildcard": wildcard_out,
         "fallback": fallback_info,
         "rationale": rationale,
+
+    # change (new or modified lines)
+        "rationale_source": r_src,
+        "rationale_meta":   r_meta,
     }
 
     # --- LOGGING: record this event ---
