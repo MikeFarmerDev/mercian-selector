@@ -28,9 +28,9 @@ class Settings:
     # OpenAI
     openai_api_key: str = os.getenv("OPENAI_API_KEY", "")
     model: str = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
-    request_timeout: float = float(os.getenv("OPENAI_TIMEOUT", "1.2"))
-    max_tokens: int = int(os.getenv("OPENAI_MAX_TOKENS", "90"))
-    temperature: float = float(os.getenv("OPENAI_TEMPERATURE", "0.4"))
+    request_timeout: float = float(os.getenv("OPENAI_TIMEOUT", "12.0"))
+    max_tokens: int = int(os.getenv("OPENAI_MAX_TOKENS", "1000"))
+    temperature: float = float(os.getenv("OPENAI_TEMPERATURE", "0.2"))
 
     # Feature flags
     enable_rationale: bool = os.getenv("ENABLE_RATIONALE", "1") == "1"
