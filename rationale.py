@@ -295,5 +295,5 @@ Return a JSON object ONLY:
 
     except Exception as e:
         print("RATIONALE ERROR:", repr(e))
-            return {"summary": "", "bullets": [], "source": "openai_error", "meta": {"error": repr(e)}}
+        return {"summary": "", "bullets": [], "source": "openai_error", "meta": {"error": repr(e)}}
 
