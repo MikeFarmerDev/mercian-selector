@@ -447,13 +447,11 @@ def recommend():
 
         app.logger.error(f"DBG_COUNTS primaries={len(primaries_out)} wildcard={len(wildcard_out)} sample_primary={(primaries_out[0].get('Product Code') if isinstance(primaries_out, list) and primaries_out else 'NONE')}")
 
-
         raw_rationale = generate_rationale(profile, primaries_out, wildcard_out)
 
-        app.logger.error(f"DBG_COUNTS primaries={len(primaries_out)} wildcard={len(wildcard_out)} sample_primary={(primaries_out[0].get('Product Code') if isinstance(primaries_out, list) and primaries_out else 'NONE')}")
-
-
-        # Normalise to string
+        # Normalise to string, preserving source/meta if present
+        src = None
+        meta = {}
         if isinstance(raw_rationale, dict):
             full_text = (
                 raw_rationale.get("summary")
@@ -461,6 +459,8 @@ def recommend():
                 or raw_rationale.get("message")
                 or ""
             )
+            src  = raw_rationale.get("source")
+            meta = raw_rationale.get("meta", {}) or {}
         else:
             full_text = str(raw_rationale or "")
 
