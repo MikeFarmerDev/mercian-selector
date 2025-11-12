@@ -1,0 +1,46 @@
+{
+  "skill": 1,
+  "attack": 8,
+  "midfield": 5,
+  "defence": 3,
+  "budget": 400.0,
+  "dragflick": 3,
+  "aerials": 9,
+  "category": "adult",
+  "priority": "both",
+  "bow": "Ultimate V2",
+  "length": 36.5,
+
+  "profile": {
+    "skill": 1,
+    "attack": 8,
+    "midfield": 5,
+    "defence": 3,
+    "budget": 400.0,
+    "dragflick": 3,
+    "aerials": 9,
+    "category": "adult",
+    "priority": "both",
+    "bow": "Ultimate V2",
+    "length": 36.5
+  },
+
+  "brief": "User prefers attacking play with emphasis on aerial skills; produce rationale aligned to brand-safe tone and facts only.",
+  "bows": ["Ultimate V2"],
+  "brand": "Mercian voice: confident, precise, no guarantees or price promises. Avoid unsupported claims.",
+  "sheet_fields": {
+    "source": "StickSelection.xlsx",
+    "fields": { "solid_core": true, "carbon_max": 95, "profiles": ["Ultimate V2"] }
+  },
+  "user_inputs": {
+    "style": "attacking + aerials",
+    "budget_gbp": 400.0,
+    "level": "intermediate",
+    "position": "forward"
+  },
+  "selected_sticks": [
+    { "sku": "CK95SC-ULTV2-36.5", "name": "CK95 SC Ultimate V2", "facts": { "carbon": 95, "core": "Solid Core", "bow": "Ultimate V2" } },
+    { "sku": "CKF90-ULTV2-36.5",  "name": "CKF90 Ultimate V2",   "facts": { "carbon": 90, "core": "Solid Core", "bow": "Ultimate V2" } },
+    { "sku": "CF85-ULTV2-36.5",   "name": "CF85 Ultimate V2",    "facts": { "carbon": 85, "core": "Solid Core", "bow": "Ultimate V2" } }
+  ]
+}
