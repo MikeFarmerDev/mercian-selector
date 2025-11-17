@@ -438,16 +438,40 @@ def recommend():
         prompt = (
             brief_text
         )
-
         combined_prompt = f"{prompt}\n\nCONTEXT:\n{context}"
         profile["_custom_prompt"] = combined_prompt
-        print(f"DBG counts — primaries:{len(primaries_out)} wildcard:{len(wildcard_out)} df_rows:{getattr(df, 'shape', ['?','?'])[0]}")
-        print("DBG_RATIONALE_INPUT",
-      "primaries_out_len=", len(primaries_out),
-      "wildcard_out_type=", type(wildcard_out),
-      "sample_primary=", primaries_out[0].get("Description") if primaries_out else "NONE")
 
-        app.logger.error(f"DBG_COUNTS primaries={len(primaries_out)} wildcard={len(wildcard_out)} sample_primary={(primaries_out[0].get('Product Code') if isinstance(primaries_out, list) and primaries_out else 'NONE')}")
+        # Safely derive wildcard count - wildcard_out may legitimately be None
+        safe_wildcard_count = 0
+        if isinstance(wildcard_out, dict):
+            safe_wildcard_count = 1
+        elif isinstance(wildcard_out, list):
+            safe_wildcard_count = len(wildcard_out)
+
+        print(
+            "DBG_COUNTS",
+            "primaries_len=", len(primaries_out),
+            "wildcard_count=", safe_wildcard_count,
+            "df_rows=", getattr(df, "shape", ["?", "?"])[0],
+        )
+        print(
+            "DBG_RATIONALE_INPUT",
+            "primaries_out_len=", len(primaries_out),
+            "wildcard_out_type=", type(wildcard_out),
+            "sample_primary=",
+            primaries_out[0].get("Description") if primaries_out else "NONE",
+        )
+
+        app.logger.error(
+            "DBG_COUNTS primaries=%s wildcard=%s sample_primary=%s",
+            len(primaries_out),
+            safe_wildcard_count,
+            (
+                primaries_out[0].get("Product Code")
+                if isinstance(primaries_out, list) and primaries_out
+                else "NONE"
+            ),
+        )
 
         raw_rationale = generate_rationale(profile, primaries_out, wildcard_out)
 
