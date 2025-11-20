@@ -523,11 +523,7 @@ def recommend():
             return None
         return {
             "code": stick.get("Product Code"),
-            "name": stick.get("Title"),
             "price": stick.get("Full Price"),
-            "bow": stick.get("Bow"),
-            "length": stick.get("Length"),
-            "url": stick.get("Product URL"),
         }
 
     primary_summary = _stick_summary(primaries_out[0]) if len(primaries_out) >= 1 else None
