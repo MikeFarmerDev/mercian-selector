@@ -117,30 +117,19 @@ def recommend():
 
     payload = request.get_json(silent=True) or {}
 
-    app.logger.error(f"DBG_PAYLOAD {payload}")
-
-    # L2_DIAG: per-request id to detect duplicate handling in prod
+    # Lightweight request ID for audit / correlation
     import hashlib, time, json as _json
     try:
         _payload_str = _json.dumps(payload, sort_keys=True, ensure_ascii=False)
     except Exception:
         _payload_str = str(payload)
-    req_id = hashlib.sha1((_payload_str + "|" + str(time.time())).encode("utf-8")).hexdigest()[:12]
-    app.logger.error(f"L2_DIAG_REQ id={req_id}")
-
-        # L2_DIAG: stable fingerprint of payload ONLY (detect duplicate handling)
-    try:
-        _payload_canon = _json.dumps(payload, sort_keys=True, ensure_ascii=False)
-    except Exception:
-        _payload_canon = str(payload)
-    fp = hashlib.sha1(_payload_canon.encode("utf-8")).hexdigest()[:12]
-    app.logger.error(f"L2_FP fp={fp}")
-
+    req_id = hashlib.sha1(
+        (_payload_str + "|" + str(time.time())).encode("utf-8")
+    ).hexdigest()[:12]
 
     required = ["skill", "attack", "midfield", "defence", "budget",
                 "dragflick", "aerials", "category", "priority", "bow", "length"]
 
-    print("DEBUG incoming payload:", payload)
     missing = [k for k in required if k != "length" and payload.get(k) in (None, "", [])]
 
     if missing:
@@ -236,10 +225,6 @@ def recommend():
     # always reload latest dataset so new Image URL / Product URL are used
     df = load_dataset()
 
-    app.logger.error("DBG_DF_DTYPES %s", {c: str(t) for c, t in df.dtypes.items()})
-    app.logger.error("DBG_DF_SAMPLE %s", df.head(2).to_dict(orient='records'))
-
-
     # [MOD] tier gating via domain
     allowed_tiers = allowed_tiers_for(profile["journey"])
 
@@ -253,12 +238,13 @@ def recommend():
 
     # [MOD] scoring via domain
     ranked = rank(results, profile, config=CONFIG).reset_index(drop=True)
-    print("DEBUG length in profile:", profile.get("length"), type(profile.get("length")))
+
     # NEW: if user picked a length, keep only rows with that exact length (fallback = keep all)
     if profile.get("length") and "Length" in ranked.columns:
         exact = ranked[ranked["Length"].astype(float) == float(profile["length"])]
         if not exact.empty:
             ranked = exact.reset_index(drop=True)
+
     # --- Phase 1: Suitability curve (0–1) + Peak selector with DF/Aerial nudges
 
     primaries_list, wildcard = [], None
@@ -396,8 +382,6 @@ def recommend():
 
     needs_openai = bool(primaries_out)
 
-    app.logger.error(f"L2_DIAG needs_openai={needs_openai} adapter_wc={word_count(adapter_text)} had_bullets={adapter_had_bullets}")
-
     if needs_openai:
         # 1) Build rich context
         # Load brief + build Product Facts from Excel for the 3 selected sticks
@@ -448,31 +432,6 @@ def recommend():
         elif isinstance(wildcard_out, list):
             safe_wildcard_count = len(wildcard_out)
 
-        print(
-            "DBG_COUNTS",
-            "primaries_len=", len(primaries_out),
-            "wildcard_count=", safe_wildcard_count,
-            "df_rows=", getattr(df, "shape", ["?", "?"])[0],
-        )
-        print(
-            "DBG_RATIONALE_INPUT",
-            "primaries_out_len=", len(primaries_out),
-            "wildcard_out_type=", type(wildcard_out),
-            "sample_primary=",
-            primaries_out[0].get("Description") if primaries_out else "NONE",
-        )
-
-        app.logger.error(
-            "DBG_COUNTS primaries=%s wildcard=%s sample_primary=%s",
-            len(primaries_out),
-            safe_wildcard_count,
-            (
-                primaries_out[0].get("Product Code")
-                if isinstance(primaries_out, list) and primaries_out
-                else "NONE"
-            ),
-        )
-
         raw_rationale = generate_rationale(profile, primaries_out, wildcard_out)
 
         # Normalise to string, preserving source/meta if present
@@ -506,7 +465,7 @@ def recommend():
 
         rationale = {"summary": full_text, "summary_html": full_text_html}
 
-        # L2_DIAG: ensure source/meta exist even if adapter supplied the rationale
+        # Ensure source/meta exist even if the adapter supplied the rationale
         if isinstance(rationale, dict) and "source" not in rationale:
             _raw = (
                 rationale.get("summary")
@@ -514,22 +473,21 @@ def recommend():
                 or rationale.get("text")
                 or ""
             )
-            # crude text-length for meta; strip tags if html-ish
+            # crude text-length for meta; strip tags if HTML-ish
             try:
                 import re as _re
                 _chars = len(_re.sub(r"<[^>]+>", "", str(_raw)))
             except Exception:
                 _chars = len(str(_raw))
+
             rationale["source"] = "deterministic"
             rationale.setdefault("meta", {})["chars"] = _chars
 
-    # L2_SANITIZE: ensure UI renders the rationale once only
-    # If HTML is present, blank the plain summary so front-end can't double-render.
+    # UI sanitisation: use HTML version only to avoid duplicate rendering
     if isinstance(rationale, dict) and rationale.get("summary_html"):
         rationale["summary"] = ""
-        app.logger.error("L2_SANITIZE rationale: using summary_html only")
 
-    r_src  = (rationale or {}).get("source", "unknown") if isinstance(rationale, dict) else "unknown"
+    r_src = (rationale or {}).get("source", "unknown") if isinstance(rationale, dict) else "unknown"
     r_meta = (rationale or {}).get("meta", {})           if isinstance(rationale, dict) else {}
 
     # line after (unchanged)
@@ -549,28 +507,52 @@ def recommend():
     # --- LOGGING: record this event ---
     from domain.logger import log_event
 
+    # Build a compact view of the AI rationale for logging
     rationale_text = ""
-    if isinstance(rationale, dict) and rationale.get("summary"):
-        rationale_text = rationale["summary"][:200].replace("\n", " ")
+    if isinstance(rationale, dict):
+        text_src = rationale.get("summary") or rationale.get("summary_html") or ""
+        import re as _re
+        cleaned = _re.sub(r"<[^>]+>", "", str(text_src))
+        rationale_text = cleaned[:500].replace("\n", " ")  # 500 chars is readable but safe
 
-    primaries_summary = ", ".join([p.get("Description", "Unknown") for p in primaries_out])
+    # Helper to extract clean summaries of stick objects
+    def _stick_summary(stick):
+        if not isinstance(stick, dict):
+            return None
+        return {
+            "code": stick.get("Product Code"),
+            "name": stick.get("Description"),
+            "price": stick.get("Full Price"),
+            "bow": stick.get("Bow"),
+            "length": stick.get("Length"),
+            "url": stick.get("Product URL"),
+        }
 
-    wildcard_summary = (
-        wildcard_out.get("Description", "None") if isinstance(wildcard_out, dict) else "None"
-    )
+    primary_summary = _stick_summary(primaries_out[0]) if len(primaries_out) >= 1 else None
+    secondary_summary = _stick_summary(primaries_out[1]) if len(primaries_out) >= 2 else None
+    wildcard_summary = _stick_summary(wildcard_out) if isinstance(wildcard_out, dict) else None
 
+    # PRIMARY CSV LOG (persistent)
     log_event({
-        "journey": profile.get("journey"),
-        "player_type": profile.get("player_type"),
-        "budget": profile.get("budget"),
-        "fallbacks": fallback_info,
-        "adapter_latency_ms": rationale.get("adapter_meta", {}).get("latency_ms") if isinstance(rationale, dict) else None,
-        "response_time_ms": request.headers.get("X-Response-Time-ms"),
-        "status": "ok" if payload.get("ok") else "error",
-        "rationale_summary": rationale_text,
-        "primaries": primaries_summary,
+        "request_id": req_id,
+        "form": profile,
+        "primary": primary_summary,
+        "secondary": secondary_summary,
         "wildcard": wildcard_summary,
+        "ai_summary": rationale_text,
+        "ai_ok": bool(payload.get("ok")),
     })
+
+    # SECONDARY RENDER LOG (live on-screen)
+    app.logger.info(
+        "SELECTOR | req=%s | form=%s | primary=%s | secondary=%s | wildcard=%s | ai_text=\"%s\"",
+        req_id,
+        profile,
+        primary_summary,
+        secondary_summary,
+        wildcard_summary,
+        rationale_text,
+    )
 
     import json
     from flask import Response
