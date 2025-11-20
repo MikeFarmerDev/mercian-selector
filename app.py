@@ -523,7 +523,7 @@ def recommend():
             return None
         return {
             "code": stick.get("Product Code"),
-            "name": stick.get("Description"),
+            "name": stick.get("Title"),
             "price": stick.get("Full Price"),
             "bow": stick.get("Bow"),
             "length": stick.get("Length"),
