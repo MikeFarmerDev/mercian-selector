@@ -9,6 +9,7 @@ from flask_cors import CORS
 import pandas as pd
 import numpy as np
 import os, time
+import logging
 import re
 
 from config_loader import load_excel_config
@@ -23,6 +24,7 @@ from domain.scoring import rank
 from domain.fallbacks import apply_fallbacks
 
 app = Flask(__name__)
+app.logger.setLevel(logging.INFO)
 
 # CORS: allow local dev + local WordPress
 ALLOWED_ORIGINS = [
