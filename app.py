@@ -25,6 +25,7 @@ from domain.fallbacks import apply_fallbacks
 
 app = Flask(__name__)
 app.logger.setLevel(logging.INFO)
+app.logger.propagate = False
 
 # CORS: allow local dev + local WordPress
 ALLOWED_ORIGINS = [
