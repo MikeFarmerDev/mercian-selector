@@ -534,10 +534,27 @@ def recommend():
     secondary_summary = _stick_summary(primaries_out[1]) if len(primaries_out) >= 2 else None
     wildcard_summary = _stick_summary(wildcard_out) if isinstance(wildcard_out, dict) else None
 
+# change (new or modified lines)
+
+    # Build a compact, user-facing form object for logging
+    form_for_log = {
+        "skill":    profile.get("skill"),
+        "attack":   profile.get("attack"),
+        "midfield": profile.get("midfield"),
+        "defence":  profile.get("defence"),
+        "budget":   profile.get("budget"),
+        "dragflick": profile.get("dragflick"),
+        "aerials":   profile.get("aerials"),
+        "category":  profile.get("category"),
+        "priority":  profile.get("priority"),
+        "bow":       profile.get("bow"),
+        "length":    profile.get("length"),
+    }
+
     # PRIMARY CSV LOG (persistent)
     log_event({
         "request_id": req_id,
-        "form": profile,
+        "form": form_for_log,
         "primary": primary_summary,
         "secondary": secondary_summary,
         "wildcard": wildcard_summary,
@@ -549,12 +566,13 @@ def recommend():
     app.logger.info(
         "SELECTOR | req=%s | form=%s | primary=%s | secondary=%s | wildcard=%s | ai_text=\"%s\"",
         req_id,
-        profile,
+        form_for_log,
         primary_summary,
         secondary_summary,
         wildcard_summary,
         rationale_text,
     )
+
 
     import json
     from flask import Response
