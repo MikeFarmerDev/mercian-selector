@@ -3,7 +3,9 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parents[0]
 EXCEL_PATH = BASE_DIR / "data" / "StickSelection.xlsx"
+EU_EXCEL_PATH = BASE_DIR / "data" / "StickSelection_EU.xlsx"
 SHEET_NAME = "Sheet1"
+
 
 def load_excel_config(path=EXCEL_PATH, sheet=SHEET_NAME):
     df = pd.read_excel(path, sheet_name=sheet)
@@ -30,3 +32,17 @@ def load_excel_config(path=EXCEL_PATH, sheet=SHEET_NAME):
         df = df[df["Shopify Status"].astype(str).str.upper() == "ACTIVE"]
 
     return df
+
+
+def load_global_config():
+    """
+    Convenience wrapper to load the Global (default) stick selection sheet.
+    """
+    return load_excel_config(path=EXCEL_PATH, sheet=SHEET_NAME)
+
+
+def load_eu_config():
+    """
+    Convenience wrapper to load the EU stick selection sheet.
+    """
+    return load_excel_config(path=EU_EXCEL_PATH, sheet=SHEET_NAME)
