@@ -120,6 +120,11 @@ def recommend():
 
     payload = request.get_json(silent=True) or {}
 
+    # Region selector via query param (?region=GLOBAL|EU|AU)
+    region = (request.args.get("region") or "").strip().upper() or "GLOBAL"
+    if region not in {"GLOBAL", "EU", "AU"}:
+        region = "GLOBAL"
+
     # Lightweight request ID for audit / correlation
     import hashlib, time, json as _json
     try:
@@ -155,6 +160,9 @@ def recommend():
         "bow": (payload.get("bow") or "").strip().lower(),
         "length": str(payload.get("length", "")).strip(),
     }
+
+    # Attach region to profile for downstream logic + logging
+    profile["region"] = region
 
     # Run your main selection logic
     # (first ranking uses current df – final ranking uses reloaded df below)
@@ -226,6 +234,8 @@ def recommend():
         profile["length"] = None
 
     # always reload latest dataset so new Image URL / Product URL are used
+    # Region is passed via env var so data_loader can choose the correct Excel
+    os.environ["SELECTOR_REGION"] = region
     df = load_dataset()
 
     # [MOD] tier gating via domain
@@ -546,6 +556,7 @@ def recommend():
         "priority":  profile.get("priority"),
         "bow":       profile.get("bow"),
         "length":    profile.get("length"),
+        "region":    profile.get("region"),
     }
 
     # PRIMARY CSV LOG (persistent)
