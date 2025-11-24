@@ -11,11 +11,28 @@ import re
 import statistics
 from pathlib import Path
 from collections import Counter
+import argparse
+from typing import Optional
 
 # ------------------------------------------------------------------
 # CONFIG
 # ------------------------------------------------------------------
-STORE_DOMAIN = os.getenv("SHOPIFY_STORE_DOMAIN", "shop.mercianhockey.com")
+# Domain is store-specific now; STORE_DOMAIN is kept only for fallback URL construction.
+GLOBAL_STORE_DOMAIN = os.getenv("SHOPIFY_STORE_DOMAIN", "shop.mercianhockey.com")
+
+VALID_STORES = {"global", "eu", "au"}
+
+def get_store_domain(store: str):
+    store = store.lower().strip()
+    if store not in VALID_STORES:
+        raise ValueError(f"Unsupported store '{store}'. Expected one of {sorted(VALID_STORES)}.")
+    if store == "global":
+        return os.getenv("SHOPIFY_STORE_DOMAIN") or GLOBAL_STORE_DOMAIN
+    if store == "eu":
+        return os.getenv("SHOPIFY_EU_STORE_DOMAIN") or GLOBAL_STORE_DOMAIN
+    if store == "au":
+        return os.getenv("SHOPIFY_AU_STORE_DOMAIN") or GLOBAL_STORE_DOMAIN
+
 
 # project root = mercian-selector
 BASE_DIR = Path(__file__).resolve().parents[1]
@@ -23,10 +40,13 @@ OUTPUTS_DIR = BASE_DIR / "outputs"
 OUTPUTS_DIR.mkdir(parents=True, exist_ok=True)
 
 # ---------- Inputs & Outputs ----------
-SRC = BASE_DIR / "ingestion" / "products_full.json"
-OUT_CSV = OUTPUTS_DIR / "shopify_update.csv"
-OUT_SUMMARY = OUTPUTS_DIR / "flatten_summary.txt"
-
+def store_paths(store: str):
+    # per-store input & output
+    # products_full_<store>.json is written at the repo root by shopify_discover.py
+    src = BASE_DIR / f"products_full_{store}.json"
+    out_csv = OUTPUTS_DIR / f"shopify_update_{store}.csv"
+    out_summary = OUTPUTS_DIR / f"flatten_summary_{store}.txt"
+    return src, out_csv, out_summary
 
 # ------------------------------------------------------------------
 # Helper functions
@@ -262,7 +282,23 @@ def num(x):
 # ------------------------------------------------------------------
 # MAIN
 # ------------------------------------------------------------------
-def main():
+def main(store: Optional[str] = None):
+    if store is None:
+        parser = argparse.ArgumentParser(description="Flatten product + variant data for a specific store.")
+        parser.add_argument(
+            "--store",
+            required=True,
+            choices=sorted(VALID_STORES),
+            help="Which store to flatten (global, eu, au)."
+        )
+        args = parser.parse_args()
+        store = args.store
+
+    SRC, OUT_CSV, OUT_SUMMARY = store_paths(store)
+
+    if not SRC.exists():
+        raise FileNotFoundError(f"Missing input: {SRC} (run discovery for store '{store}' first)")
+
     products = load_products(SRC)
 
     # discover metafield columns dynamically
@@ -377,7 +413,9 @@ def main():
             if not product_url:
                 handle = prod.get("handle") or ""
                 if handle:
-                    product_url = f"https://{STORE_DOMAIN}/products/{handle}"
+                    domain = get_store_domain(store)
+                    product_url = f"https://{domain}/products/{handle}"
+
             row["Product URL"] = product_url
 
             # Description Narrative already on prod → row already has it
@@ -445,7 +483,6 @@ def main():
 
     OUT_SUMMARY.write_text("\n".join(lines), encoding="utf-8")
     print(f"Wrote {OUT_CSV} and {OUT_SUMMARY}")
-
 
 if __name__ == "__main__":
     main()

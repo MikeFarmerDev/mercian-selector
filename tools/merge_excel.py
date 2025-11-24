@@ -1,5 +1,6 @@
 import os
 import json
+import argparse
 import csv
 from datetime import datetime
 from shutil import copyfile
@@ -55,9 +56,39 @@ def _norm(val):
 
 
 def main():
+    # Optional CLI region argument:
+    #   python merge_excel.py GLOBAL
+    #   python merge_excel.py EU
+    #   python merge_excel.py AU
+    parser = argparse.ArgumentParser(
+        description="Merge Shopify flattened CSV into StickSelection Excel (single region per run)."
+    )
+    parser.add_argument(
+        "region",
+        nargs="?",
+        help="Region to process (e.g. GLOBAL, EU, AU). If omitted, use top-level excel/shopify/inventory/reporting config."
+    )
+    args = parser.parse_args()
+
     config = load_config()
 
+    # If regions are defined in config and a region is passed on the CLI,
+    # override the top-level excel/shopify/inventory/reporting blocks
+    # with that region's settings.
+    regions_cfg = config.get("regions") or {}
+    if args.region:
+        region_key = args.region.upper()
+        region_cfg = regions_cfg.get(region_key)
+        if region_cfg is None:
+            print(f"[sync] WARNING: region '{args.region}' not found in config['regions']; using top-level config instead.")
+        else:
+            for key in ("excel", "shopify", "inventory", "reporting"):
+                if key in region_cfg:
+                    config[key] = region_cfg[key]
+            print(f"[sync] Using region '{region_key}' configuration from sync_map.json")
+
     excel_path = os.path.join(BASE_DIR, config["excel"]["path"])
+
     sheet_name = config["excel"]["sheet"]
     primary_key = config["excel"]["primary_key"]
 

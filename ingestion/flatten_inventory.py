@@ -8,6 +8,8 @@ import os
 from pathlib import Path
 from datetime import datetime
 import requests
+import argparse
+from typing import Optional
 
 BASE_DIR = Path(__file__).resolve().parent.parent  # repo root
 ENV_PATH = BASE_DIR / ".env"
@@ -21,33 +23,53 @@ if ENV_PATH.exists():
         k, v = line.split("=", 1)
         os.environ.setdefault(k.strip(), v.strip())
 
-SHOPIFY_STORE_DOMAIN = os.getenv("SHOPIFY_STORE_DOMAIN")
-SHOPIFY_ADMIN_TOKEN = os.getenv("SHOPIFY_ADMIN_TOKEN")
 SHOPIFY_API_VERSION = os.getenv("SHOPIFY_API_VERSION", "2025-01")
 
-INGESTION_DIR = BASE_DIR / "outputs"
-IN_PATH = INGESTION_DIR / "inventory_levels.json"  # produced by ingestion/shopify_inventory.py
-OUT_CSV = INGESTION_DIR / "inventory_flat.csv"
-OUT_SUMMARY = INGESTION_DIR / "inventory_summary.txt"
+VALID_STORES = {"global", "eu", "au"}
 
-def _session():
+INGESTION_DIR = BASE_DIR / "outputs"
+
+def _get_store_credentials(store: str):
+    store = store.lower().strip()
+    if store not in VALID_STORES:
+        raise ValueError(f"Unsupported store '{store}'. Expected one of {sorted(VALID_STORES)}.")
+
+    if store == "global":
+        domain = os.getenv("SHOPIFY_STORE_DOMAIN")
+        token = os.getenv("SHOPIFY_ADMIN_TOKEN")
+    elif store == "eu":
+        domain = os.getenv("SHOPIFY_EU_STORE_DOMAIN")
+        token = os.getenv("SHOPIFY_EU_ADMIN_TOKEN")
+    elif store == "au":
+        domain = os.getenv("SHOPIFY_AU_STORE_DOMAIN")
+        token = os.getenv("SHOPIFY_AU_ADMIN_TOKEN")
+
+    if not domain or not token:
+        raise RuntimeError(f"Missing Shopify credentials for store '{store}' in .env")
+
+    return {"domain": domain, "token": token}
+
+def _session(token: str):
     s = requests.Session()
     s.headers.update({
-        "X-Shopify-Access-Token": SHOPIFY_ADMIN_TOKEN or "",
+        "X-Shopify-Access-Token": token,
         "Content-Type": "application/json",
     })
     return s
 
-def _fetch_locations():
-    """Return {location_id:int -> name:str}. If no creds, fall back to ID as str."""
+def _fetch_locations(store: str):
+    """Return {location_id -> name} for this store."""
+    creds = _get_store_credentials(store)
     mapping = {}
-    if not SHOPIFY_STORE_DOMAIN or not SHOPIFY_ADMIN_TOKEN:
-        return mapping  # no enrichment, still flatten
-    url = f"https://{SHOPIFY_STORE_DOMAIN}/admin/api/{SHOPIFY_API_VERSION}/locations.json"
-    resp = _session().get(url, timeout=30)
+
+    url = f"https://{creds['domain']}/admin/api/{SHOPIFY_API_VERSION}/locations.json"
+    resp = _session(creds["token"]).get(url, timeout=30)
     resp.raise_for_status()
+
     for loc in resp.json().get("locations", []):
-        mapping[int(loc["id"])] = loc.get("name") or str(loc["id"])
+        lid = int(loc["id"])
+        mapping[lid] = loc.get("name") or str(lid)
+
     return mapping
 
 def _parse_iso(s):
@@ -56,15 +78,31 @@ def _parse_iso(s):
     except Exception:
         return None
 
-def main():
-    if not IN_PATH.exists():
-        raise FileNotFoundError(f"Missing input: {IN_PATH} (run ingestion/shopify_inventory.py first)")
+def main(store: Optional[str] = None):
+    # Parse store from CLI if not provided programmatically
+    if store is None:
+        parser = argparse.ArgumentParser(description="Flatten Shopify inventory for a specific store.")
+        parser.add_argument(
+            "--store",
+            required=True,
+            choices=sorted(VALID_STORES),
+            help="Which store to flatten inventory for (global, eu, au).",
+        )
+        args = parser.parse_args()
+        store = args.store
 
-    payload = json.loads(IN_PATH.read_text(encoding="utf-8"))
+    # Input/output paths for this store
+    in_path = INGESTION_DIR / f"inventory_levels_{store}.json"
+    out_csv = INGESTION_DIR / f"inventory_flat_{store}.csv"
+    out_summary = INGESTION_DIR / f"inventory_summary_{store}.txt"
+
+    if not in_path.exists():
+        raise FileNotFoundError(f"Missing input: {in_path} (run shopify_inventory.py --store {store})")
+
+    payload = json.loads(in_path.read_text(encoding="utf-8"))
     levels = payload.get("inventory_levels", [])
 
-    # Enrich location names if possible
-    loc_map = _fetch_locations()
+    loc_map = _fetch_locations(store)
 
     # --- Excel-safe text forcing to preserve long IDs ---
     def _excel_text(s):
@@ -75,7 +113,8 @@ def main():
 
     PURE_CSV = False  # flip True for raw numeric output
 
-    with OUT_CSV.open("w", newline="", encoding="utf-8") as f:
+    with out_csv.open("w", newline="", encoding="utf-8") as f:
+
         w = csv.writer(f)
         w.writerow(["inventory_item_id","location_id","location_name","available","updated_at","admin_graphql_api_id"])
         for row in levels:
@@ -109,7 +148,8 @@ def main():
     oldest = dates_sorted[0].isoformat() if dates_sorted else "n/a"
     newest = dates_sorted[-1].isoformat() if dates_sorted else "n/a"
 
-    with OUT_SUMMARY.open("w", encoding="utf-8") as f:
+    with out_summary.open("w", encoding="utf-8") as f:
+
         f.write(f"Flattened rows: {total}\n")
         f.write(f"Updated_at range: {oldest} → {newest}\n")
         f.write("Rows by location_id (name):\n")
@@ -122,7 +162,8 @@ def main():
             label = f"{lid} ({name})" if name else f"{lid}"
             f.write(f"  - {label}: {count}\n")
 
-    print(f"[flatten] ✅ Wrote {OUT_CSV} and {OUT_SUMMARY}")
+    print(f"[flatten] ✅ Wrote {out_csv} and {out_summary}")
+
 
 if __name__ == "__main__":
     main()

@@ -1,17 +1,21 @@
 {
-  "phase": "Shopify → Excel Sync",
+  "phase": "Shopify \u2192 Excel Sync",
+
   "excel": {
     "path": "data/StickSelection.xlsx",
     "sheet": "Sheet1",
     "primary_key": "Product Code"
   },
+
   "shopify": {
     "source_json": "products_full.json",
     "flattened_csv": "outputs/shopify_update.csv"
   },
-    "inventory": {
+
+  "inventory": {
     "flat_csv": "outputs/inventory_flat.csv"
   },
+
   "columns": {
     "allowed_updates": {
       "Price (excluding VAT)": "shopify.price_ex_vat",
@@ -40,7 +44,7 @@
       "Bow",
       "Carbon",
       "Length"
-        ],
+    ],
     "create_if_missing": [
       "Image URL",
       "Product URL",
@@ -55,15 +59,79 @@
     "vat_column": "VAT Rate",
     "default_vat_rate": 0.2
   },
+
   "reporting": {
     "sync_report_csv": "outputs/sync_report.csv",
     "coaching_exceptions_csv": "outputs/sync_exceptions_coaching.csv",
     "backup_dir": "backups"
   },
+
   "behaviour": {
     "allow_new_products": true,
     "list_new_in_report": true,
     "list_missing_in_report": true,
     "never_delete_excel_rows": true
+  },
+
+  "regions": {
+    "GLOBAL": {
+      "excel": {
+        "path": "data/StickSelection.xlsx",
+        "sheet": "Sheet1",
+        "primary_key": "Product Code"
+      },
+      "shopify": {
+        "source_json": "products_full.json",
+        "flattened_csv": "outputs/shopify_update.csv"
+      },
+      "inventory": {
+        "flat_csv": "outputs/inventory_flat.csv"
+      },
+      "reporting": {
+        "sync_report_csv": "outputs/sync_report_GLOBAL.csv",
+        "coaching_exceptions_csv": "outputs/sync_exceptions_coaching_GLOBAL.csv",
+        "backup_dir": "backups/global"
+      }
+    },
+
+    "EU": {
+      "excel": {
+        "path": "data/StickSelection_EU.xlsx",
+        "sheet": "Sheet1",
+        "primary_key": "Product Code"
+      },
+      "shopify": {
+        "source_json": "products_full.json",
+        "flattened_csv": "outputs/shopify_update_EU.csv"
+      },
+      "inventory": {
+        "flat_csv": "outputs/inventory_flat_EU.csv"
+      },
+      "reporting": {
+        "sync_report_csv": "outputs/sync_report_EU.csv",
+        "coaching_exceptions_csv": "outputs/sync_exceptions_coaching_EU.csv",
+        "backup_dir": "backups/eu"
+      }
+    },
+
+    "AU": {
+      "excel": {
+        "path": "data/StickSelection_AU.xlsx",
+        "sheet": "Sheet1",
+        "primary_key": "Product Code"
+      },
+      "shopify": {
+        "source_json": "products_full.json",
+        "flattened_csv": "outputs/shopify_update_AU.csv"
+      },
+      "inventory": {
+        "flat_csv": "outputs/inventory_flat_AU.csv"
+      },
+      "reporting": {
+        "sync_report_csv": "outputs/sync_report_AU.csv",
+        "coaching_exceptions_csv": "outputs/sync_exceptions_coaching_AU.csv",
+        "backup_dir": "backups/au"
+      }
+    }
   }
 }
