@@ -16,7 +16,7 @@ Write a professional, client-facing explanation in Mercian’s confident, UK-Eng
 • Ends with one clear reassurance sentence about control, confidence, and performance.
 
 STRUCTURE
-Paragraph 1 – Link the customer’s goals (from PLAYER_PROFILE) to the overall selection, but only use skills scored higher than 6  
+Paragraph 1 – Link the customer’s goals for scores higher than 6 (from PLAYER_PROFILE) to the overall selection, but do not talk about them being preferences if the score is lower than a 7.
 Paragraph 2 – Compare the three sticks factually, showing what’s common and what differs (Carbon %, Power vs Touch, Bow type, etc.).  
 Paragraph 3 – Reassurance line that reinforces confidence and alignment with the player’s journey.
 
