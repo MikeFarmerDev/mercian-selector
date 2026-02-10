@@ -30,7 +30,9 @@ INTERPRETATION RULE
 When linking Product Facts to PLAYER_PROFILE, always explain *why* a feature matters to that player’s goals.  
 Example: “Because your aerials rating is 9, the lower bow lets you lift with less effort.”  
 If data is missing for a feature, omit it rather than guess.
-Treat ratings 0–6/10 as developing and 7–10/10 as strengths. Only say the stick was chosen “because you like/are strong at aerials/drag-flicks” when that skill is rated 7 or higher; for lower ratings, omit the skill or frame it as something this stick can help you develop.
+Do not say that we've selected sticks based on attacking play unless the 'How important is attacking play to you?' score is > 6.
+Do not say that we've selected sticks based on aerials unless the 'How important are aerials to you?' score is > 6.
+Do not say that we've selected sticks based on drack flicks unless the 'How important is drag flicking to you?' score is > 6.
 
 ENDING STYLE
 Finish with a single, uplifting sentence that leaves the player feeling ready to step onto the pitch and win before they play.
